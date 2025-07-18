@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Homework Compiler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .school-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-container, .dashboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .role-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 1rem;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin: 0.25rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .question-card, .submission-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .class-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+            resize: vertical;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .output-area {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 150px;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .error-output {
+            color: #ff4444;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .school-name {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Python Homework Compiler</h1>
+        <div class="school-name">Atomic Energy Central School No. 3, Tarapur</div>
+    </div>
+
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="login-container">
+            <h2 class="login-title">Login</h2>
+            
+            <div class="role-selector">
+                <div class="role-btn active" onclick="selectRole('teacher')">Teacher</div>
+                <div class="role-btn" onclick="selectRole('student')">Student</div>
+            </div>
+
+            <!-- Teacher Login -->
+            <form id="teacherLogin">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="teacherUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="teacherPassword" required>
+                </div>
+                <button type="submit" class="btn">Login as Teacher</button>
+            </form>
+
+            <!-- Student Login -->
+            <form id="studentLogin" class="hidden">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="studentClass" required>
+                        <option value="">Select Class</option>
+                        <option value="9A">9A</option>
+                        <option value="9B">9B</option>
+                        <option value="10A">10A</option>
+                        <option value="10B">10B</option>
+                        <option value="11A">11A</option>
+                        <option value="11B">11B</option>
+                        <option value="12A">12A</option>
+                        <option value="12B">12B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Roll No</label>
+                    <input type="number" id="studentRoll" required>
+                </div>
+                <button type="submit" class="btn">Login as Student</button>
+            </form>
+        </div>
+
+        <!-- Teacher Dashboard -->
+        <div id="teacherDashboard" class="dashboard-container hidden">
+            <div class="dashboard-nav">
+                <div class="dashboard-title">Teacher Dashboard</div>
+                <div class="user-info">
+                    <span id="teacherName"></span>
+                    <button class="btn btn-small btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab-btn active" onclick="switchTab('questions')">Manage Questions</div>
+                <div class="tab-btn" onclick="switchTab('submissions')">Review Submissions</div>
+            </div>
+
+            <!-- Questions Tab -->
+            <div id="questionsTab" class="tab-content active">
+                <div class="grid-2">
+                    <div>
+                        <h3>Add New Question</h3>
+                        <form id="questionForm">
+                            <div class="form-group">
+                                <label>Class</label>
+                                <select id="questionClass" required>
+                                    <option value="">Select Class</option>
+                                    <option value="9A">9A</option>
+                                    <option value="9B">9B</option>
+                                    <option value="10A">10A</option>
+                                    <option value="10B">10B</option>
+                                    <option value="11A">11A</option>
+                                    <option value="11B">11B</option>
+                                    <option value="12A">12A</option>
+                                    <option value="12B">12B</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Question Title</label>
+                                <input type="text" id="questionTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Question Description</label>
+                                <textarea id="questionDescription" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">Add Question</button>
+                        </form>
+                    </div>
+                    <div>
+                        <h3>Existing Questions</h3>
+                        <div id="questionsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submissions Tab -->
+            <div id="submissionsTab" class="tab-content">
+                <h3>Student Submissions</h3>
+                <div id="submissionsList"></div>
+            </div>
+        </div>
+
+        <!-- Student Dashboard -->
+        <div id="studentDashboard" class="dashboard-container hidden">
+            <div class="dashboard-nav">
+                <div class="dashboard-title">Student Dashboard</div>
+                <div class="user-info">
+                    <span id="studentInfo"></span>
+                    <button class="btn btn-small btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div id="studentQuestions"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Made by Sona O.K., PGT Computer Science, AECS No.3
+    </div>
+
+    <script>
+        // Global state
+        let currentUser = null;
+        let currentRole = 'teacher';
+        let questions = [];
+        let submissions = [];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSampleData();
+            setupEventListeners();
+        });
+
+        function loadSampleData() {
+            // Sample questions for demonstration
+            questions = [
+                {
+                    id: 1,
+                    class: '9A',
+                    title: 'Hello World Program',
+                    description: 'Write a Python program that prints "Hello, World!" to the console.',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    class: '10A',
+                    title: 'Simple Calculator',
+                    description: 'Create a program that takes two numbers and an operator (+, -, *, /) and performs the calculation.',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+
+            // Sample submissions
+            submissions = [
+                {
+                    id: 1,
+                    questionId: 1,
+                    studentName: 'John Doe',
+                    studentClass: '9A',
+                    studentRoll: 15,
+                    code: 'print("Hello, World!")',
+                    submittedAt: new Date().toISOString()
+                }
+            ];
+        }
+
+        function setupEventListeners() {
+            document.getElementById('teacherLogin').addEventListener('submit', handleTeacherLogin);
+            document.getElementById('studentLogin').addEventListener('submit', handleStudentLogin);
+            document.getElementById('questionForm').addEventListener('submit', handleAddQuestion);
+        }
+
+        function selectRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (role === 'teacher') {
+                document.getElementById('teacherLogin').classList.remove('hidden');
+                document.getElementById('studentLogin').classList.add('hidden');
+            } else {
+                document.getElementById('teacherLogin').classList.add('hidden');
+                document.getElementById('studentLogin').classList.remove('hidden');
+            }
+        }
+
+        function handleTeacherLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('teacherUsername').value;
+            const password = document.getElementById('teacherPassword').value;
+            
+            // Simple authentication (in real app, use proper auth)
+            if (username === 'teacher' && password === 'password') {
+                currentUser = { username, role: 'teacher' };
+                showTeacherDashboard();
+            } else {
+                alert('Invalid credentials. Use username: teacher, password: password');
+            }
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value;
+            const studentClass = document.getElementById('studentClass').value;
+            const roll = document.getElementById('studentRoll').value;
+            
+            currentUser = { name, class: studentClass, roll, role: 'student' };
+            showStudentDashboard();
+        }
+
+        function showTeacherDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('teacherDashboard').classList.remove('hidden');
+            document.getElementById('teacherName').textContent = currentUser.username;
+            loadQuestions();
+            loadSubmissions();
+        }
+
+        function showStudentDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('studentInfo').textContent = `${currentUser.name} (${currentUser.class} - Roll: ${currentUser.roll})`;
+            loadStudentQuestions();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.add('hidden');
+            // Reset forms
+            document.getElementById('teacherLogin').reset();
+            document.getElementById('studentLogin').reset();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function handleAddQuestion(e) {
+            e.preventDefault();
+            const questionClass = document.getElementById('questionClass').value;
+            const title = document.getElementById('questionTitle').value;
+            const description = document.getElementById('questionDescription').value;
+            
+            const newQuestion = {
+                id: questions.length + 1,
+                class: questionClass,
+                title,
+                description,
+                createdAt: new Date().toISOString()
+            };
+            
+            questions.push(newQuestion);
+            loadQuestions();
+            document.getElementById('questionForm').reset();
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = 'Question added successfully!';
+            document.getElementById('questionForm').appendChild(successDiv);
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+
+        function loadQuestions() {
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            
+            questions.forEach(question => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.innerHTML = `
+                    <div class="question-meta">
+                        <span class="class-badge">${question.class}</span>
+                        <button class="btn btn-small btn-danger" onclick="deleteQuestion(${question.id})">Delete</button>
+                    </div>
+                    <h4>${question.title}</h4>
+                    <p>${question.description}</p>
+                `;
+                questionsList.appendChild(questionCard);
+            });
+        }
+
+        function deleteQuestion(questionId) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                questions = questions.filter(q => q.id !== questionId);
+                loadQuestions();
+            }
+        }
+
+        function loadSubmissions() {
+            const submissionsList = document.getElementById('submissionsList');
+            submissionsList.innerHTML = '';
+            
+            submissions.forEach(submission => {
+                const question = questions.find(q => q.id === submission.questionId);
+                if (!question) return;
+                
+                const submissionCard = document.createElement('div');
+                submissionCard.className = 'submission-card';
+                submissionCard.innerHTML = `
+                    <div class="question-meta">
+                        <div>
+                            <strong>${question.title}</strong> - ${question.class}
+                        </div>
+                        <div>${submission.studentName} (Roll: ${submission.studentRoll})</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                        <pre><code>${submission.code}</code></pre>
+                    </div>
+                    <button class="btn btn-small btn-success" onclick="compileSubmission(${submission.id})">Compile & Test</button>
+                `;
+                submissionsList.appendChild(submissionCard);
+            });
+        }
+
+        function compileSubmission(submissionId) {
+            const submission = submissions.find(s => s.id === submissionId);
+            if (!submission) return;
+            
+            try {
+                const result = runPythonCode(submission.code);
+                alert(`Compilation Result:\n${result}`);
+            } catch (error) {
+                alert(`Compilation Error:\n${error.message}`);
+            }
+        }
+
+        function loadStudentQuestions() {
+            const studentQuestions = document.getElementById('studentQuestions');
+            studentQuestions.innerHTML = '';
+            
+            const classQuestions = questions.filter(q => q.class === currentUser.class);
+            
+            if (classQuestions.length === 0) {
+                studentQuestions.innerHTML = '<p>No questions assigned to your class yet.</p>';
+                return;
+            }
+            
+            classQuestions.forEach(question => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                questionDiv.innerHTML = `
+                    <h3>${question.title}</h3>
+                    <p>${question.description}</p>
+                    <div class="form-group">
+                        <label>Your Solution:</label>
+                        <textarea class="code-editor" id="code-${question.id}" placeholder="Write your Python code here..."></textarea>
+                    </div>
+                    <div class="code-actions">
+                        <button class="btn btn-small btn-success" onclick="runCode(${question.id})">Run Code</button>
+                        <button class="btn btn-small" onclick="submitCode(${question.id})">Submit Code</button>
+                    </div>
+                    <div class="output-area" id="output-${question.id}">Output will appear here...</div>
+                `;
+                studentQuestions.appendChild(questionDiv);
+            });
+        }
+
+        function runCode(questionId) {
+            const code = document.getElementById(`code-${questionId}`).value;
+            const outputArea = document.getElementById(`output-${questionId}`);
+            
+            if (!code.trim()) {
+                outputArea.textContent = 'Please enter some code to run.';
+                outputArea.className = 'output-area error-output';
+                return;
+            }
+            
+            try {
+                const result = runPythonCode(code);
+                outputArea.textContent = result;
+                outputArea.className = 'output-area';
+            } catch (error) {
+                outputArea.textContent = `Error: ${error.message}`;
+                outputArea.className = 'output-area error-output';
+            }
+        }
+
+        function submitCode(questionId) {
+            const code = document.getElementById(`code-${questionId}`).value;
+            
+            if (!code.trim()) {
+                alert('Please enter some code before submitting.');
+                return;
+            }
+            
+            const newSubmission = {
+                id: submissions.length + 1,
+                questionId,
+                studentName: currentUser.name,
+                studentClass: currentUser.class,
+                studentRoll: parseInt(currentUser.roll),
+                code,
+                submittedAt: new Date().toISOString()
+            };
+            
+            submissions.push(newSubmission);
+            alert('Code submitted successfully!');
+            
+            // Clear the code editor
+            document.getElementById(`code-${questionId}`).value = '';
+            document.getElementById(`output-${questionId}`).textContent = 'Output will appear here...';
+            document.getElementById(`output-${questionId}`).className = 'output-area';
+        }
+
+        function runPythonCode(code) {
+            // Simple Python-like interpreter for basic operations
+            // This is a simplified version - in a real app, you'd use a proper Python interpreter
+            
+            let output = '';
+            const originalConsoleLog = console.log;
+            
+            // Override console.log to capture output
+            console.log = function(...args) {
+                output += args.join(' ') + '\n';
+            };
+            
+            try {
+                // Convert basic Python syntax to JavaScript
+                let jsCode = code
+                    .replace(/print\s*\(/g, 'console.log(')
+                    .replace(/input\s*\(/g, 'prompt(')
+                    .replace(/len\s*\(/g, '(')
+                    .replace(/range\s*\(/g, 'Array.from({length: ')
+                    .replace(/def\s+(\w+)\s*\(/g, 'function $1(')
+                    .replace(/:\s*$/gm, ' {')
+                    .replace(/^\s*(\w+)\s*=\s*(.+)$/gm, 'let $1 = $2;');
+                
+                // Add closing braces for functions (simplified)
+                const lines = jsCode.split('\n');
+                let indentLevel = 0;
+                const processedLines = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const currentIndent = line.search(/\S/);
+                    
+                    if (currentIndent === -1) {
+                        processedLines.push(line);
+                        continue;
+                    }
+                    
+                    if (currentIndent < indentLevel) {
+                        processedLines.push('}');
+                        indentLevel = currentIndent;
+                    }
+                    
+                    processedLines.push(line);
+                    
+                    if (line.includes('function') || line.includes('if') || line.includes('for')) {
+                        indentLevel = currentIndent + 4;
+                    }
+                }
+                
+                // Execute the JavaScript code
+                eval(processedLines.join('\n'));
+                
+            } catch (error) {
+                console.log = originalConsoleLog;
+                throw new Error(`Python execution error: ${error.message}`);
+            }
+            
+            console.log = originalConsoleLog;
+            return output || 'Code executed successfully (no output)';
+        }
+    </script>
+</body>
+</html>
